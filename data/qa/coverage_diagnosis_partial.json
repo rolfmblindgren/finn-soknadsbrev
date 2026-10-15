@@ -1,0 +1,15 @@
+{
+  "unitSemantics": {
+    "group_count": "Unique job ads (annonser). Confirmed: extent Heltid+Deltid hits sum equals group_count; industry pagination unique ids equals that filter's group_count.",
+    "match_count": "Total positions (stillinger). Sample pages 1-3: 150 ads, sum(no_of_positions)=280; catalog match/group≈2.03.",
+    "ourDataset": "One row per unique FINN ad id (group_count unit)."
+  },
+  "industryUnionLive": 8778,
+  "catalogGroupCountLive": 13886,
+  "adsWithoutIndustryTagApprox": 5108,
+  "v1CoverageOfLiveIndustryUnion": {
+    "overlap": 8760,
+    "missing": 18,
+    "v1OnlyChurnedOrNoIndustryNow": 228
+  }
+}
