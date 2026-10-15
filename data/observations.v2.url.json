@@ -1,0 +1,11 @@
+{
+  "variable": "FINN_OBSERVATIONS_V2_URL",
+  "url": "https://osf.io/download/6ad09bbb2f79cf3fe336520a/",
+  "alternateDownload": "https://files.us.osf.io/v1/resources/bnaqd/providers/osfstorage/6ad09bbb2f79cf3fe336520a",
+  "osfProject": "https://osf.io/bnaqd/",
+  "fileName": "observations.v2.jsonl",
+  "sizeBytes": 51231271,
+  "sha256": "f993024e6d04e9158ebd285e8578adfe34f261a86617bb03909918b0e33951ed",
+  "md5": "0639f128dcb811b127767eb93e9ccd57",
+  "uploadedAt": "2026-10-15T09:24:11Z"
+}
