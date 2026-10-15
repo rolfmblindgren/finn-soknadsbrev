@@ -1,0 +1,1 @@
+See README.md for how to stitch reports/forskningsrapport.md.part.* and unpack analysis sidecars.
