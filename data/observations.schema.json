@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://local/finn-soknadsbrev/observations.schema.json",
+  "title": "FinnSoknadsbrevObservation",
+  "type": "object",
+  "required": [
+    "id",
+    "url",
+    "industry",
+    "industryValue",
+    "originalClassification",
+    "matched",
+    "classificationText",
+    "recordVersion"
+  ],
+  "properties": {
+    "id": { "type": "string", "description": "FINN ad id" },
+    "url": { "type": "string", "format": "uri" },
+    "title": { "type": ["string", "null"] },
+    "company": { "type": ["string", "null"] },
+    "industry": {
+      "type": ["string", "null"],
+      "description": "First industry filter name that contained the ad in scanner order"
+    },
+    "industryValue": { "type": ["string", "null"] },
+    "originalClassification": {
+      "type": "string",
+      "enum": ["asks", "silent", "rejects", "error"]
+    },
+    "matched": { "type": ["string", "null"] },
+    "classificationText": {
+      "type": "string",
+      "description": "Plain-text JobPosting description used as classification basis"
+    },
+    "observedAt": { "type": ["string", "null"], "format": "date-time" },
+    "rebuiltAt": { "type": ["string", "null"], "format": "date-time" },
+    "recordVersion": { "type": "integer", "const": 1 },
+    "error": { "type": "string" },
+    "provenance": { "type": "object" }
+  },
+  "additionalProperties": true
+}
