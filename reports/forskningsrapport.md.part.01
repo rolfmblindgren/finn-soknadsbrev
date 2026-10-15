@@ -1,0 +1,231 @@
+- «… at du legger ved både CV og søknadsbrev.» (CEWE Japan Photo; id `475517149`)
+
+
+
+#### `optional` (asks)
+
+Mønstre: «søknadsbrev er valgfritt», «valgfritt søknadsbrev», «optional cover letter».
+
+**Observert i aktiv populasjon med gjeldende mønstre: 0 annonser.** Kategorien er definert og implementert, men tom i dette tverrsnittet. **Ikke dokumentert:** om valgfrihet uttrykkes med andre formuleringer som ikke dekkes av mønstrene.
+
+#### `uncertain`
+
+Mønstre: «fortell (litt) om deg selv», «motivasjon for å søke», «hva motiverer deg», «beskriv din motivasjon», «kort motivasjon» — uten samtidig treff på required/reject.
+
+**Eksempeltype:** Annonser som ber kandidaten «fortelle om seg selv» i fritetekst uten å navngi søknadsbrev/motivasjonsbrev som dokumentkrav. I aktiv populasjon: **50** rader.
+
+#### `no_info` (silent)
+
+Ingen treff på overstående. Eksempeltype: stillingsannonser som beskriver oppgaver, kvalifikasjoner og «søk her» uten å nevne søknadsbrev eller nærliggende begreper (f.eks. mange håndverks-/helseannonser).
+
+### 3.4 Berikelsesvariabler
+
+
+| Variabel              | Operasjonalisering                                                                                 | Kjent begrensning                                                                                      |
+| --------------------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| **Bransje**           | First-seen `industry` fra innsamling; gap-fill uten tag → «Uten bransjetagg»                       | Ikke full medlemskapsvektor; multi-tag                                                                 |
+| **Yrke**              | FINN occupation-filtre; `occupationPrimary` = første i enum                                        | Multi-tag                                                                                              |
+| **Sektor**            | FINN `job_sector` der tilgjengelig; ellers selskapsheuristikk → «Offentlig (heuristic)» / «Ukjent» | Heuristikk mer usikker                                                                                 |
+| **Rekrutteringsbyrå** | Selskapsnavn matcher `AGENCY_COMPANY_PATTERNS` **eller** id i FINN job_duration «Bemanningsbyrå»   | Underdeteksjon av ukjente byrånavn mulig; overdeteksjon ved generiske ord («match», «personnel») mulig |
+| **Tittelnivå**        | Regex på stillingstittel: leder / junior / senior / annet                                          | Grovt; mange ledere uten «leder» i tittel                                                              |
+
+
+Regelsett: `scripts/enrich_observations.py`.
+
+### 3.5 Kjente restfeil i gold4 (ikke fullstendig kvantifisert)
+
+Reject-mønstrene er ikke uttømmende. Formuleringer som «**i stedet for** søknadsbrev …» eller «trenger ikke **å legge ved** et søknadsbrev» kan fortsatt klassifiseres som `required` fordi ordet *søknadsbrev* treffer required-mønsteret etter at reject-sjekken har feilet. Dette er en **dokumentert feilkilde**. En full manuell census av alle 867 `required` i aktiv populasjon er **ikke gjennomført**; residual positiv rate for gold4-asks er derfor **ikke eksakt kjent** (kun at den er > 0).
+
+---
+
+
+
+## 4. Validering
+
+
+
+### 4.1 Utvalgsmetode (produksjonsklassifisering, v1)
+
+
+| Egenskap      | Verdi                                                         |
+| ------------- | ------------------------------------------------------------- |
+| Populasjon    | v1, N = 8 987 analyserbare (ekskl. 1 error)                   |
+| Design        | Stratifisert tilfeldig innen predikert klasse                 |
+| Frø           | 14 (`random.Random(14)`; sortert på id; shuffle; ta første n) |
+| asks          | n = 100 av 498                                                |
+| silent        | n = 100 av 8 442                                              |
+| rejects       | **census** — alle 47                                          |
+| Lagret utvalg | `data/qa/validation_sample.json`                              |
+| Rapport       | `data/qa/validation_report.json`                              |
+
+
+Utvalget er **ikke** SRS over alle annonser; vekting brukes ved samlet feilrate.
+
+### 4.2 Gullstandard i utvalget
+
+Samme gold4-skjema som i §3, anvendt på lagret tekst. Usikre telles ikke som sikre feil/korrekte.
+
+### 4.3 Feilmatrise (predikert → gold3), sikre tilfeller
+
+
+| Predikert \ Gull (3-veis) | asks | silent | rejects | n   | Feilrate |
+| ------------------------- | ---- | ------ | ------- | --- | -------- |
+| asks                      | 89   | 0      | 11      | 100 | 11,0 %   |
+| silent                    | 1    | 99     | 0       | 100 | 1,0 %    |
+| rejects                   | 0    | 0      | 47      | 47  | 0,0 %    |
+
+
+Wilson 95 % CI for stratumfeilrater: asks 6,3–18,6 %; silent 0,2–5,5 %; rejects 0–7,6 %.
+
+**Stratifisert samlet feilrate:** Σh Wh eh ≈ **1,55 %** (approx. vektet Wilson-bånd ca. 0,5–6,2 %).
+
+### 4.4 Identifiserte feilkilder (produksjon)
+
+1. **Falske asks:** Ordet «søknadsbrev» i negerte formuleringer («Du trenger ikke skrive søknadsbrev») — 11/100 i asks-stratum; flere Bane NOR-maler.
+2. **Missede asks i silent:** Full census av alle 8 442 silent i v1 fant 88 `required` (dominerende signaler: *søknadstekst*, *personlig søknad*, bøyde former) og 28 `explicit_reject`; 40 `uncertain`.
+3. **Rejects:** 0 falske positive i full census av 47.
+
+
+
+### 4.5 Fra produksjon til endelige prosentandeler
+
+1. Valideringen motiverte **gold4**-regelsettet (reject-først; utvidede synonymer).
+2. Gold4 ble deretter kjørt som **regelbasert census** på all lagret tekst i v2/aktiv populasjon — ikke som manuell omkoding av hele materialet.
+3. Endelige asks-/rejects-andeler i §5–6 er gold4 på **aktiv** populasjon med `uncertain` utenfor nevner.
+4. Produksjonsbaserte «korrigerte» andeler fra v1-valideringen (asks ~5,91 %) er **historisk kontekst** for v1; de er **ikke** mekanisk overført til aktiv census.
+
+**Ikke dokumentert:** Dobbelt manuell koding / interkoderreliabilitet; blind manuell stikkprøve av gold4 på aktiv populasjon utover mønsterdefinisjonene.
+
+---
+
+
+
+## 5. Statistiske analyser
+
+
+
+### 5.1 Estimatorer
+
+- **Andel:** \hat{p} = k/n der n = antall sikre (ikke `uncertain`) i relevant delpopulasjon.
+- **Konfidensintervall:** Wilson 95 % (z = 1,96), implementert i `wilson_ci` i `scripts/run_research_analysis.py`.
+- **Effektstørrelse (to grupper):** Risikodifferanse RD = \hat{p}_1 - \hat{p}_2 (asks-andel).
+- **Multivariabel modell:** L2-regularisert logistisk regresjon (egen implementasjon, uten sklearn); SE fra diagonal Hessian-approksimasjon. Utfall = asks (1) vs. ikke-asks blant sikre. Tolkning: **beskrivende assosiasjoner**, ikke kausale effekter.
+
+
+
+### 5.2 Primærnevner (aktiv populasjon)
+
+
+| Størrelse                       | Antall     | Rolle                                    |
+| ------------------------------- | ---------- | ---------------------------------------- |
+| Live union                      | 13 886     | Aktiv katalog (= `group_count` ved enum) |
+| derav `uncertain`               | 50         | Ekskludert fra treveis-nevner            |
+| **Sikre (nevner)**              | **13 836** | Primær nevner for andeler                |
+| asks (`required`; 0 `optional`) | 867        | Tellinger                                |
+| silent (`no_info`)              | 12 866     |                                          |
+| rejects (`explicit_reject`)     | 103        |                                          |
+| Churn (utenfor aktiv)           | 228        | Ikke i nevner                            |
+
+
+
+
+### 5.3 Samlede andeler (aktiv, sikre)
+
+
+| Størrelse | k / n           | Andel      | 95 % Wilson |
+| --------- | --------------- | ---------- | ----------- |
+| Asks      | 867 / 13 836    | **6,27 %** | 5,87–6,68 % |
+| Silent    | 12 866 / 13 836 | 92,99 %    | —           |
+| Rejects   | 103 / 13 836    | 0,74 %     | 0,61–0,90 % |
+
+
+
+
+### 5.4 Effektstørrelser (aktiv)
+
+
+| Kontrast              | \hat{p}_1           | \hat{p}_2           | RD           |
+| --------------------- | ------------------- | ------------------- | ------------ |
+| Byrå − direkte/ukjent | 5,12 % (41/800)     | 6,34 % (826/13 036) | **−1,21 pp** |
+| Offentlig − privat    | 10,60 % (485/4 575) | 4,17 % (364/8 729)  | **+6,43 pp** |
+
+
+Wilson-intervallene for byrå vs. direkte **overlapper** (byrå 3,80–6,88 %; direkte 5,93–6,77 %). Intervallene for offentlig vs. privat **overlapper ikke**.
+
+### 5.5 Logistisk regresjon (aktiv delpopulasjon)
+
+Utvalg: sikre rader med sektor ∈ {Offentlig, Privat}, n = **13304**.  
+Modell: asks ~ agency + public_sector + title_leder + title_junior (+ intercept), L2 = 0,5.
+
+
+| Ledd          | Koeff.  | SE     | z       | OR    |
+| ------------- | ------- | ------ | ------- | ----- |
+| intercept     | -3.2246 | 0.0598 | -53.941 | —     |
+| agency        | 0.2400  | 0.1711 | 1.403   | 1.271 |
+| public_sector | 1.0734  | 0.0755 | 14.219  | 2.925 |
+| title_leder   | 0.0724  | 0.1681 | 0.431   | 1.075 |
+| title_junior  | 2.1696  | 0.2145 | 10.114  | 8.754 |
+
+
+Observasjoner:
+
+- `public_sector`: OR ≈ 2,93; z ≈ 14,2 — sterk positiv assosiasjon med asks.
+- `title_junior`: OR ≈ 8,75; z ≈ 10,1 — sterk positiv assosiasjon (tittelord junior/trainee/intern o.l.).
+- `agency`: OR ≈ 1,27; z ≈ 1,40 — **ikke** et klart negativt estimat; usikkert/svakt positivt etter kontroll.
+- `title_leder`: nær null.
+
+
+
+### 5.6 Usikkerhet — tre lag
+
+
+| Lag                              | Hva det dekker                                              | Hvordan det er håndtert                                                                                                                                                                                                    |
+| -------------------------------- | ----------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **1. Utvalgsusikkerhet**         | Variasjon i andelsestimater gitt klassene                   | Wilson CI; for aktiv census er «utvalg» = hele synlige katalogen ved t₀, så CI her uttrykker i praksis usikkerhet under en binomisk modell / overførbarhet — **ikke** SRS fra en større endelig populasjon utover FINN-søk |
+| **2. Klassifiseringsusikkerhet** | Feil i produksjon (målt) og restfeil i gold4 (delvis kjent) | Stratifisert validering av produksjon; gold4 reduserer kjente feil men har udokumentert residual FP (§3.5)                                                                                                                 |
+| **3. Generalisering i tid**      | Andre datoer, sesong, konjunktur                            | **Ikke estimert** — ett tverrsnitt; markedschurn er empirisk (228 v1-id-er borte)                                                                                                                                          |
+
+
+**Ikke dokumentert:** Bootstrap av hele pipeline; sensitivitetsanalyse med manuell omkoding av asks; design-effekt for multi-tag bransje.
+
+---
+
+
+
+## 6. Resultater
+
+
+
+### 6.1 Samlet fordeling (aktiv populasjon)
+
+Gold4-tellinger (n = 13 886): `no_info` 12 866 · `required` 867 · `explicit_reject` 103 · `uncertain` 50 · `optional` 0.
+
+![Klassfordeling](figures/class_distribution.svg)
+
+*Figurmerknad: SVG-figurene under* `reports/figures/` *er generert fra v2-superset-kjøringen (*`run_research_analysis.py`*). Tallene i tabellene nedenfor er rekalkulert for **aktiv** populasjon og skal brukes ved avvik.*
+
+**Observert:** Aktiv etterspørsel etter søknadsbrev er en minoritetspraksis (~6,3 %). De fleste annonser er silent. Eksplisitt avvisning forekommer, men er sjelden (~0,7 %).
+
+### 6.2 Bransje (full tabell, aktiv, sikre)
+
+Bransje = first-seen industry; «Uten bransjetagg» = gap-fill uten industry-felt. Sum n = 13 836.
+
+
+| Gruppe                                      | n (sikre) | asks | silent | rejects | asks %  | 95 % Wilson   | rejects % |
+| ------------------------------------------- | --------- | ---- | ------ | ------- | ------- | ------------- | --------- |
+| Uten bransjetagg                            | 5114      | 317  | 4791   | 6       | 6.20 %  | 5.57–6.89 %   | 0.12 %    |
+| Helse og omsorg                             | 1334      | 44   | 1289   | 1       | 3.30 %  | 2.47–4.40 %   | 0.07 %    |
+| Butikk og varehandel                        | 851       | 85   | 759    | 7       | 9.99 %  | 8.15–12.19 %  | 0.82 %    |
+| Drift og vedlikeholdstjenester              | 500       | 21   | 464    | 15      | 4.20 %  | 2.76–6.34 %   | 3.00 %    |
+| Barn, skole og undervisning                 | 420       | 16   | 404    | 0       | 3.81 %  | 2.36–6.10 %   | 0.00 %    |
+| Konsulent og rådgivning                     | 418       | 48   | 364    | 6       | 11.48 % | 8.77–14.90 %  | 1.44 %    |
+| Bygg og anlegg                              | 343       | 18   | 319    | 6       | 5.25 %  | 3.34–8.14 %   | 1.75 %    |
+| Kraft og energi                             | 296       | 8    | 285    | 3       | 2.70 %  | 1.38–5.24 %   | 1.01 %    |
+| Bil, kjøretøy og verksted                   | 284       | 7    | 277    | 0       | 2.46 %  | 1.20–5.00 %   | 0.00 %    |
+| Olje og gass                                | 272       | 1    | 268    | 3       | 0.37 %  | 0.06–2.05 %   | 1.10 %    |
+| Forsvar og militær                          | 234       | 6    | 221    | 7       | 2.56 %  | 1.18–5.48 %   | 2.99 %    |
+| Bank, finans og forsikring                  | 225       | 22   | 193    | 10      | 9.78 %  | 6.55–14.36 %  | 4.44 %    |
+| Transport og logistikk                      | 215       | 10   | 204    | 1       | 4.65 %  | 2.55–8.35 %   | 0.47 %    |
+| Forskning, utdanning og vitenskap           | 208       | 86   | 121    | 1       | 41.35 % | 34.87–48.14 % | 0.48 %    |
+| Elektronikk                                 | 204       | 9    | 195    | 0       | 4.41 %  | 2.34–8.17 %   | 0.00 %    |
+| Håndverkstjenester                          | 192       | 1    | 190    | 1       | 0.52 %  | 0.09–2.89 %   | 0.52 %    |
