@@ -1,0 +1,211 @@
+# Søknadsbrev i norske stillingsannonser på FINN: En empirisk tverrsnittsstudie
+
+**Rapporttype:** Etterprøvbar forskningsrapport (metode, validering, statistikk, fullstendige tabeller)  
+**Analysepopulasjon (primær):** Aktiv FINN Jobb-populasjon ved enumeringstidspunktet (`industry ∪ occupation` = `group_count` = 13 886 annonser)  
+**Klassifisering:** Regelbasert gold4 på lagret annonsetekst, kollapset til asks / silent / rejects; `uncertain` ekskludert fra treveis-nevner  
+**Kort resultatoversikt:** Se separat dokument `[reports/resultatoversikt.md](resultatoversikt.md)`  
+**Maskinlesbare resultater (aktiv populasjon):** `[data/analysis/research_results_active.json](../data/analysis/research_results_active.json)`  
+**Maskinlesbare resultater (v2-superset, tidligere kjøring):** `[data/analysis/research_results.json](../data/analysis/research_results.json)`
+
+---
+
+
+
+## 1. Problemstilling og hypoteser
+
+
+
+### 1.1 Problemstilling
+
+Studien undersøker praktiseringen av **søknadsbrev** (inkl. nærliggende begreper som motivasjonsbrev, søknadstekst og personlig søknad) i norske stillingsannonser publisert på FINN Jobb. Problemstillingen kan formuleres som:
+
+> Hvor utbredt er det at FINN-annonser eksplisitt ber om, ikke nevner, eller eksplisitt avviser søknadsbrev — og hvordan varierer denne praksisen etter bransje, sektor og rekrutteringskanal?
+
+En offentlig debatt hevder ofte at «rekrutteringsbransjen er i ferd med å avskaffe søknadsbrevet». Denne påstanden er **sammensatt**: den blander (i) nivå (andel som ber om søknadsbrev), (ii) aktør (byrå vs. direkte arbeidsgiver), og (iii) tidstrend (endring over tid). Dataene i denne studien er et **tverrsnitt** og kan derfor belyse (i) og delvis (ii), men **ikke** (iii) direkte.
+
+Studien er deskriptiv og konfirmerende innenfor et begrenset sett hypoteser. Den tar ikke stilling til om søknadsbrev *bør* brukes, og den måler ikke kandidaters faktiske innsendingsatferd. Observasjonsenheten er annonsetekst slik den forelå (eller ble re-hentet) i FINNs offentlige flate.
+
+### 1.2 Analyseenhet
+
+Analyseenheten er den unike stillingsannonsen (FINN ad-id), tilsvarende FINNs `group_count`. Dette er **ikke** det samme som antall stillinger/posisjoner (`match_count` / `no_of_positions`). Ved enumeringstidspunktet (2026-10-14T22:52:05Z) var `group_count` = 13 886 og `match_count` = 28 135 (`data/qa/coverage_report.json`).
+
+### 1.3 Hypoteser som dataene kan (og ikke kan) belyse
+
+
+| Hypotese | Påstand                                                                                               | Testbar med tilgjengelige data? | Operasjonalisering                                                                                     |
+| -------- | ----------------------------------------------------------------------------------------------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| **A**    | Rekrutteringsbyråer etterspør søknadsbrev sjeldnere enn øvrige annonsører                             | Delvis ja                       | Binær byråindikator (selskapsmønstre ∪ FINN «Bemanningsbyrå») vs. rå asks-andel og multivariabel logit |
+| **B**    | Søknadsbrev er sjeldnere i yrker med stor forventet søkertilgang                                      | **Nei**                         | Mangler mål på søkertilgang; antall annonser ≠ søkertilgang                                            |
+| **C**    | Å ikke nevne søknadsbrev (`silent`) er empirisk og konseptuelt ulikt eksplisitt avvisning (`rejects`) | Ja                              | Frekvensforhold, innholdsforskjell i tekst, feilklassifiseringsmønstre                                 |
+
+
+**Hva dataene faktisk kan si noe om:**
+
+1. Andelen annonser i den **aktive** FINN-katalogen (ved et bestemt tidspunkt) som ber om, ikke nevner, eller avviser søknadsbrev — gitt klassifiseringsdefinisjonene i §3.
+2. Beskrivende variasjon etter first-seen bransje, FINN-sektor, byråflagg, occupation-primær og tittelbasert nivå.
+3. Assosiative, multivariable sammenhenger (logit) mellom asks og byrå / offentlig sektor / tittelnivå.
+
+**Hva dataene ikke kan dokumentere:**
+
+1. Om praksisen er «i ferd med å» endres over tid (krever tidsserie / gjentatte tverrsnitt).
+2. Kausale effekter av byråstatus eller sektor (observasjonsdata med begrenset kovariatkontroll).
+3. Søkeres faktiske atferd (om de sender søknadsbrev når det ikke er nevnt).
+4. Hypotese B (mangler valid indikator for søkertilgang).
+
+---
+
+
+
+## 2. Datainnsamling
+
+
+
+### 2.1 Kilde og innsamlingsmetode
+
+Data ble hentet fra FINNs offentlige jobbsøk-API (`SEARCH_ID_JOB_FULLTIME`) og tilhørende annonsesider. Innsamlingen ble gjennomført i to faser samme døgn (2026-10-14): først en bransjebasert skanning som ble frosset som v1, deretter en dekningsdiagnose og occupation-basert gap-fill som etablerte v2 og den aktive live-unionen.
+
+1. **Søk / enumerering:** Paginering per filterverdi (inntil 50 sider × 50 treff = 2 500 per filter). For hvert filter ble `enumerated` sammenlignet med `claimedHits`; i den endelige enumeringen traff ingen filter sidetaket (`data/qa/coverage_report.json`, `industryFilterCompleteness`). Dermed kan manglende dekning i v1 ikke tilskrives sidetak per bransje.
+2. **Annonsetekst:** Primært JobPosting JSON-LD fra annonsesiden. Der JSON-LD manglet, ble tekst hentet fra HTML-feltet `ad-description` (dokumentert i dekningsrapporten). **Ikke dokumentert per rad:** hvilken tekstkilde som ble brukt for hver enkelt annonse i den endelige fila (kun at begge strategier ble brukt).
+3. **Klassifisering ved innsamling:** Produksjonsklassifisering (`originalClassification` / asks–silent–rejects) basert på mønstre kjørt mot lagret tekst. Denne lagres for sporbarhet; analyse bruker gold4 (§3).
+
+Ufiltrert søk alene kan ikke dekke katalogen fordi FINN begrenser paginering til 50 sider. Filter-splitting (industry, deretter occupation) er derfor nødvendig for census-lignende dekning.
+
+### 2.2 Fryst v1-uttrekk (bransjefiltre)
+
+
+| Felt    | Verdi                                                              |
+| ------- | ------------------------------------------------------------------ |
+| Fil     | `data/original/observations.v1.jsonl`                              |
+| Antall  | 8 988 unike FINN-id-er                                             |
+| SHA-256 | `f661d455e4b61a4f2b33ed5fc34a556cd45385a16bd74185f875bbe14ab9cecc` |
+| Fryst   | 2026-10-14T21:50:54Z                                               |
+| Policy  | Immutable — ikke overskriv                                         |
+
+
+v1 ble samlet ved å paginere **alle 69 bransjefiltre**. Manifestet (`data/original/observations.v1.manifest.json`) registrerer to restfeil: `478157143` (terminert under live-skanning, ingen tekst) og `478496863` (HTTP 404 ved re-hent; annonse borte).
+
+**Begrensning oppdaget etter frys:** Live bransjeunion var bare 8 778 unike id-er, mens katalogens `group_count` var ca. 13 886. Hovedårsaken var annonser **uten bransjetagg** (estimert ≈ 5 108), som ikke er treffbare via `industry=`*. Se `reports/dekning.md` og `data/qa/coverage_report.json`.
+
+### 2.3 Dekningskontroll: industry ∪ occupation
+
+For å oppnå full søke-API-dekning ble alle **occupation**-filtre enumerert i tillegg. Ved 2026-10-14T22:52:05Z:
+
+
+| Størrelse                          | Antall |
+| ---------------------------------- | ------ |
+| `group_count` (katalog)            | 13 886 |
+| Live union `industry ∪ occupation` | 13 886 |
+| Gap mot `group_count`              | **0**  |
+| Occupation alene                   | 13 865 |
+
+
+Dermed er den enumertede live-unionen en **komplett census** av annonser som FINNs søke-API eksponerer på det tidspunktet (gitt at filtrene dekker katalogen — empirisk verifisert ved gap = 0).
+
+### 2.4 Gap-fill og v2-merge
+
+
+| Steg                                                           | Antall     |
+| -------------------------------------------------------------- | ---------- |
+| Fryst v1                                                       | 8 988      |
+| Manglet i live union ved gap-fill-start                        | 5 126      |
+| Nye rader hentet (`data/incremental/observations.v2add.jsonl`) | 5 126      |
+| Fetch-feil blant nye                                           | **0**      |
+| Merged v2 (`data/observations.v2.jsonl`)                       | **14 114** |
+| Overlap v2 ∩ live union                                        | 13 886     |
+| Fortsatt mangler i live                                        | 0          |
+
+
+v1 beholdes uendret; v2 = v1 ∪ tillegg (dedupe på id; v1 vinner ved konflikt). Gap-fill-rader oppdaget via occupation uten bransjetagg har `industry = null` («Uten bransjetagg» i tabeller).
+
+### 2.5 De 228 annonsene som ikke lenger var aktive
+
+**Definisjon:** ID-er som finnes i v2, men **ikke** i live-unionen `industry ∪ occupation` ved enumeringstidspunktet. Antall: **228** (`collection.v2OnlyNotInLiveUnion` i dekningsrapporten; liste: `data/qa/churned_ids.txt`).
+
+**Opphav:** Disse er v1-observasjoner som falt ut av den live søkbare katalogen mellom v1-innsamling og enumering/gap-fill (utløpt, fjernet, eller midlertidig usynlig for søkefiltrene). Dekningsrapporten skiller ikke videre mellom disse årsakene; **årsaksfordeling er ikke dokumentert**.
+
+**Klassifisering (gold4) blant de 228:**
+
+
+| Klasse             | Antall  |
+| ------------------ | ------- |
+| `no_info` (silent) | 212     |
+| `required` (asks)  | 13      |
+| `explicit_reject`  | 1       |
+| `uncertain`        | 2       |
+| **Sum**            | **228** |
+
+
+Asks-andel blant sikre churn-rader: 13 / 226 = 5,75 % (Wilson 3,39–9,59 %) — tallmessig nær den aktive populasjonen, men n er lite.
+
+**Håndtering i analyser (viktig for nevner):**
+
+1. **Primære andeler, bransje-/sektor-/byråtabeller og logit i denne rapporten** bruker den **aktive** populasjonen: n = 13 886 live-id-er; sikre klasser n = **13 836** (50 `uncertain` ekskludert fra treveis-nevner).
+2. De 228 churn-radene **beholdes i v2** som historiske observasjoner (reproduserbarhet / sporbarhet), men **inngår ikke** i aktive populasjonsnevere.
+3. Tidligere resultatoversikt / `research_results.json` ble kjørt på **hele v2** (14 114). Forskjellen i asks-andel er liten (v2 sikre: 880/14 062 = 6,26 %; aktiv sikre: 867/13 836 = 6,27 %), men prinsippet er at **aktiv katalog** er den korrekte nevneren for «hvor vanlig er dette på FINN nå».
+
+**Ikke dokumentert:** Eksakt tidspunkt for når hver av de 228 forsvant; om de fortsatt var synlige via direkte URL; eventuell differanse mellom «fjernet» og «mistet alle filtre».
+
+### 2.6 Hva som skjedde med annonser som forsvant under innsamlingen
+
+
+| Hendelse                    | Håndtering                                                                | Dokumentasjon                   |
+| --------------------------- | ------------------------------------------------------------------------- | ------------------------------- |
+| 404 ved re-hent i v1        | Lagret uten tekst der det ikke lot seg hente; 1 kjent tilfelle i manifest | `observations.v1.manifest.json` |
+| Terminering midt i skanning | 1 rad merket `error`                                                      | samme                           |
+| Gap-fill fetch              | 0 feil blant 5 126 nye                                                    | `coverage_report.json`          |
+| Churn etter v1              | Beholdt i v2; ekskludert fra aktiv nevner                                 | §2.5                            |
+
+
+---
+
+
+
+## 3. Operasjonalisering
+
+
+
+### 3.1 To klassifiseringslag
+
+1. **Produksjon (**`originalClassification`**):** Mønsterbasert klassifisering ved innsamling (asks / silent / rejects / error). Brukt i v1-valideringsutvalget.
+2. **Analyse (gold4):** Utvidet regelsett i `scripts/run_research_analysis.py` (samme mønstre som `validate_classification.py`), kjørt på **lagret** `classificationText`. Dette er primær analyseklassifisering i rapporten.
+
+Prioritetsrekkefølge i gold4: **reject → optional → required → uncertain → no_info**.
+
+### 3.2 Definisjoner (gold4)
+
+
+| Label             | Definisjon                                                                  | Kollaps til treveis (`analysis3`)      |
+| ----------------- | --------------------------------------------------------------------------- | -------------------------------------- |
+| `required`        | Teksten ber om / krever søknadsbrev eller nærliggende dokument              | **asks**                               |
+| `optional`        | Søknadsbrev omtales eksplisitt som valgfritt                                | **asks**                               |
+| `explicit_reject` | Teksten sier eksplisitt at søknadsbrev ikke skal sendes / ikke er nødvendig | **rejects**                            |
+| `no_info`         | Ingen av mønstrene over treffer                                             | **silent**                             |
+| `uncertain`       | Mykt motivasjonsspråk uten klart krav om eget brev/dokument                 | **uncertain** (utenfor treveis-nevner) |
+
+
+**Nevnerregel:** Andeler asks / silent / rejects beregnes blant rader der `analysis3 ≠ uncertain`. Usikre telles og rapporteres separat.
+
+### 3.3 Mønstre og konkrete eksempler
+
+
+
+#### `explicit_reject` (rejects)
+
+Typiske mønstre (utdrag): «trenger ikke skrive … søknad», «søknadsbrev er ikke nødvendig», «ikke send søknadsbrev», «no cover letter», «skip the cover letter».
+
+**Eksempler fra aktiv populasjon:**
+
+- «Du trenger ikke skrive en lang søknad. Send oss CV …» (Tallo Regnskap; id `474324557`)
+- «Du trenger ikke skrive en lang søknad. Send oss CV-en din …» (Rent Renholdstjenester; id `475526157`)
+- Bane NOR-mal (fra valideringsutvalg): «Du trenger ikke skrive søknadsbrev - en godt utfylt CV og dine svar i søknadsprosessen er alt …»
+
+
+
+#### `required` (asks)
+
+Mønstre inkl. ordstammer/fraser: *søknadsbrev*, *motivasjonsbrev*, *søknadstekst*, *personlig søknad*, *cover letter*, «fortell … hvorfor du søker», «beskriv hvorfor du søker».
+
+**Eksempler:**
+
+- «Vi ønsker at du sender en personlig søknad og forteller oss hvorfor du ønsker å jobbe hos Sport Outlet» (id `475430979`)
+- «Vi ønsker at CV og søknadsbrev legges i ett dokument …» (Capgemini; id `475451271`)
