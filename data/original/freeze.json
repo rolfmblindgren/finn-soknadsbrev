@@ -1,0 +1,7 @@
+{
+  "frozenAt": "2026-10-14T21:50:54Z",
+  "path": "data/original/observations.v1.jsonl",
+  "sha256": "f661d455e4b61a4f2b33ed5fc34a556cd45385a16bd74185f875bbe14ab9cecc",
+  "nRecords": 8988,
+  "policy": "Immutable original extract. All analysis reads this file; never overwrite."
+}
