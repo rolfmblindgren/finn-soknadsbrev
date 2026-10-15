@@ -1,0 +1,142 @@
+{
+  "generatedAt": "2026-10-14T23:12:50Z",
+  "unitSemantics": {
+    "group_count": "Unike stillingsannonser (FINN ad id). Verifisert: sum(extent hits)=group_count; paginering per filter gir enum==group_count.",
+    "match_count": "Antall stillinger/posisjoner (sum no_of_positions). Katalog match/group ≈ 2.",
+    "datasetUnit": "Én rad per unik FINN-annonse-id (= group_count-enhet)."
+  },
+  "catalogAtEnumeration": {
+    "matchCount": 28135,
+    "groupCount": 13886,
+    "fetchedAt": "2026-10-14T22:52:05Z"
+  },
+  "why8988WasIncomplete": {
+    "primaryCause": "Innsamlingsstrategien brukte kun bransjefiltre. Mange annonser mangler bransjetagg og er da ikke treffbare via industry=*.",
+    "industryUnionSize": 8778,
+    "adsWithoutIndustryTag": 5108,
+    "pageCapOnIndustryFilters": false,
+    "firstSeenIndustryRatiosMisleading": "Tidligere QA sammenlignet first-seen-bransje med liveHits; lave ratioer for sene bransjer skyldes deduplisering, ikke manglende paginering.",
+    "v1CoverageOfLiveIndustryUnion": {
+      "overlap": 8760,
+      "missingIndustryTagged": 18,
+      "v1NotInLiveIndustryUnion": 228
+    }
+  },
+  "expandedStrategy": {
+    "filters": [
+      "industry",
+      "occupation"
+    ],
+    "result": "industry∪occupation union size equals catalog group_count (full search-ID coverage).",
+    "combinedUnionSize": 13886,
+    "gapVsGroupCount": 0,
+    "occupationAloneUnion": 13865
+  },
+  "collection": {
+    "v1FrozenN": 8988,
+    "v1Sha256Policy": "immutable data/original/observations.v1.jsonl",
+    "missingAtGapFillStart": 5126,
+    "fetchedAdditions": 5126,
+    "fetchErrors": 0,
+    "v2MergedN": 14114,
+    "v2CoverageOfLiveUnion": {
+      "overlap": 13886,
+      "stillMissingLiveIds": 0,
+      "coverageRatio": 1.0
+    },
+    "v2OnlyNotInLiveUnion": 228,
+    "noteOnSuperset": "v2 kan være større enn live union fordi v1 inneholder annonser som er fjernet/utløpt etter innsamling (churn), pluss nyhentede live-ID-er."
+  },
+  "classifications": {
+    "v1": {
+      "silent": 8442,
+      "asks": 498,
+      "rejects": 47,
+      "error": 1
+    },
+    "additions": {
+      "silent": 4887,
+      "asks": 235,
+      "rejects": 4
+    },
+    "v2": {
+      "silent": 13329,
+      "asks": 733,
+      "rejects": 51,
+      "error": 1
+    }
+  },
+  "industryFilterCompleteness": [
+    {"value": "1", "name": "Arbeidstaker- og arbeidsgiverorganisasjoner", "claimedHits": 26, "enumerated": 26, "ratio": 1.0, "pageCapHit": false},
+    {"value": "10", "name": "Juridiske tjenester", "claimedHits": 88, "enumerated": 88, "ratio": 1.0, "pageCapHit": false},
+    {"value": "11", "name": "Kjemisk industri", "claimedHits": 71, "enumerated": 71, "ratio": 1.0, "pageCapHit": false},
+    {"value": "12", "name": "Arkitektur, areal og interiør", "claimedHits": 47, "enumerated": 47, "ratio": 1.0, "pageCapHit": false},
+    {"value": "13", "name": "Arkiv og bibliotek", "claimedHits": 11, "enumerated": 11, "ratio": 1.0, "pageCapHit": false},
+    {"value": "14", "name": "Barn, skole og undervisning", "claimedHits": 424, "enumerated": 424, "ratio": 1.0, "pageCapHit": false},
+    {"value": "15", "name": "Bil- og bildelproduksjon", "claimedHits": 114, "enumerated": 114, "ratio": 1.0, "pageCapHit": false},
+    {"value": "16", "name": "Bil, kjøretøy og verksted", "claimedHits": 390, "enumerated": 390, "ratio": 1.0, "pageCapHit": false},
+    {"value": "17", "name": "Drift og vedlikeholdstjenester", "claimedHits": 540, "enumerated": 540, "ratio": 1.0, "pageCapHit": false},
+    {"value": "18", "name": "Dyr og dyrehelse", "claimedHits": 45, "enumerated": 45, "ratio": 1.0, "pageCapHit": false},
+    {"value": "19", "name": "Eiendom", "claimedHits": 211, "enumerated": 211, "ratio": 1.0, "pageCapHit": false},
+    {"value": "2", "name": "Bank, finans og forsikring", "claimedHits": 245, "enumerated": 245, "ratio": 1.0, "pageCapHit": false},
+    {"value": "20", "name": "Elektronikk", "claimedHits": 237, "enumerated": 237, "ratio": 1.0, "pageCapHit": false},
+    {"value": "21", "name": "Event og arrangementer", "claimedHits": 96, "enumerated": 96, "ratio": 1.0, "pageCapHit": false},
+    {"value": "22", "name": "Forskning, utdanning og vitenskap", "claimedHits": 295, "enumerated": 295, "ratio": 1.0, "pageCapHit": false},
+    {"value": "23", "name": "Forsvar og militær", "claimedHits": 284, "enumerated": 284, "ratio": 1.0, "pageCapHit": false},
+    {"value": "24", "name": "Grossisthandel import/eksport", "claimedHits": 122, "enumerated": 122, "ratio": 1.0, "pageCapHit": false},
+    {"value": "25", "name": "Fiskeri og oppdrett", "claimedHits": 99, "enumerated": 99, "ratio": 1.0, "pageCapHit": false},
+    {"value": "26", "name": "Helse og omsorg", "claimedHits": 1448, "enumerated": 1448, "ratio": 1.0, "pageCapHit": false},
+    {"value": "27", "name": "Hotell og overnatting", "claimedHits": 143, "enumerated": 143, "ratio": 1.0, "pageCapHit": false},
+    {"value": "28", "name": "HR, organisasjonsutvikling og rekruttering", "claimedHits": 144, "enumerated": 144, "ratio": 1.0, "pageCapHit": false},
+    {"value": "29", "name": "Håndverkstjenester", "claimedHits": 383, "enumerated": 383, "ratio": 1.0, "pageCapHit": false},
+    {"value": "3", "name": "Butikk og varehandel", "claimedHits": 1091, "enumerated": 1091, "ratio": 1.0, "pageCapHit": false},
+    {"value": "30", "name": "Ideelle organisasjoner", "claimedHits": 178, "enumerated": 178, "ratio": 1.0, "pageCapHit": false},
+    {"value": "31", "name": "Idrett og trening", "claimedHits": 71, "enumerated": 71, "ratio": 1.0, "pageCapHit": false},
+    {"value": "32", "name": "Internettbaserte tjenester", "claimedHits": 110, "enumerated": 110, "ratio": 1.0, "pageCapHit": false},
+    {"value": "33", "name": "IT - maskinvare", "claimedHits": 66, "enumerated": 66, "ratio": 1.0, "pageCapHit": false},
+    {"value": "34", "name": "Konsulent og rådgivning", "claimedHits": 670, "enumerated": 670, "ratio": 1.0, "pageCapHit": false},
+    {"value": "35", "name": "Kraft og energi", "claimedHits": 447, "enumerated": 447, "ratio": 1.0, "pageCapHit": false},
+    {"value": "36", "name": "Kunst og kultur", "claimedHits": 58, "enumerated": 58, "ratio": 1.0, "pageCapHit": false},
+    {"value": "37", "name": "Luftfart", "claimedHits": 105, "enumerated": 105, "ratio": 1.0, "pageCapHit": false},
+    {"value": "38", "name": "Markedsanalyse", "claimedHits": 25, "enumerated": 25, "ratio": 1.0, "pageCapHit": false},
+    {"value": "39", "name": "Markedsføring og annonsering", "claimedHits": 130, "enumerated": 130, "ratio": 1.0, "pageCapHit": false},
+    {"value": "4", "name": "Bygg og anlegg", "claimedHits": 1053, "enumerated": 1053, "ratio": 1.0, "pageCapHit": false},
+    {"value": "40", "name": "Matvareproduksjon og -industri", "claimedHits": 269, "enumerated": 269, "ratio": 1.0, "pageCapHit": false},
+    {"value": "41", "name": "Medie- og innholdsproduksjon", "claimedHits": 60, "enumerated": 60, "ratio": 1.0, "pageCapHit": false},
+    {"value": "42", "name": "Medisinsk utstyr og rekvisita", "claimedHits": 37, "enumerated": 37, "ratio": 1.0, "pageCapHit": false},
+    {"value": "43", "name": "Metaller og mineraler", "claimedHits": 30, "enumerated": 30, "ratio": 1.0, "pageCapHit": false},
+    {"value": "44", "name": "Miljøtjenester", "claimedHits": 86, "enumerated": 86, "ratio": 1.0, "pageCapHit": false},
+    {"value": "45", "name": "Musikk", "claimedHits": 18, "enumerated": 18, "ratio": 1.0, "pageCapHit": false},
+    {"value": "46", "name": "Olje og gass", "claimedHits": 472, "enumerated": 472, "ratio": 1.0, "pageCapHit": false},
+    {"value": "48", "name": "Organisasjoner", "claimedHits": 76, "enumerated": 76, "ratio": 1.0, "pageCapHit": false},
+    {"value": "49", "name": "Politi og sikkerhet", "claimedHits": 174, "enumerated": 174, "ratio": 1.0, "pageCapHit": false},
+    {"value": "5", "name": "Farmasi og legemiddel", "claimedHits": 58, "enumerated": 58, "ratio": 1.0, "pageCapHit": false},
+    {"value": "50", "name": "PR, informasjon og kommunikasjon", "claimedHits": 45, "enumerated": 45, "ratio": 1.0, "pageCapHit": false},
+    {"value": "51", "name": "Reise og turisme", "claimedHits": 136, "enumerated": 136, "ratio": 1.0, "pageCapHit": false},
+    {"value": "52", "name": "Renovasjon og renhold", "claimedHits": 157, "enumerated": 157, "ratio": 1.0, "pageCapHit": false},
+    {"value": "53", "name": "Restaurant, mat og uteliv", "claimedHits": 359, "enumerated": 359, "ratio": 1.0, "pageCapHit": false},
+    {"value": "55", "name": "Shipping", "claimedHits": 53, "enumerated": 53, "ratio": 1.0, "pageCapHit": false},
+    {"value": "56", "name": "Storhusholdning og catering", "claimedHits": 92, "enumerated": 92, "ratio": 1.0, "pageCapHit": false},
+    {"value": "57", "name": "Tekstil", "claimedHits": 125, "enumerated": 125, "ratio": 1.0, "pageCapHit": false},
+    {"value": "58", "name": "Telekommunikasjon", "claimedHits": 178, "enumerated": 178, "ratio": 1.0, "pageCapHit": false},
+    {"value": "59", "name": "Transport og logistikk", "claimedHits": 546, "enumerated": 546, "ratio": 1.0, "pageCapHit": false},
+    {"value": "6", "name": "Underholdning", "claimedHits": 22, "enumerated": 22, "ratio": 1.0, "pageCapHit": false},
+    {"value": "60", "name": "Trevareindustri", "claimedHits": 32, "enumerated": 32, "ratio": 1.0, "pageCapHit": false},
+    {"value": "61", "name": "Velvære", "claimedHits": 43, "enumerated": 43, "ratio": 1.0, "pageCapHit": false},
+    {"value": "62", "name": "Verksindustri", "claimedHits": 102, "enumerated": 102, "ratio": 1.0, "pageCapHit": false},
+    {"value": "63", "name": "VVS", "claimedHits": 107, "enumerated": 107, "ratio": 1.0, "pageCapHit": false},
+    {"value": "64", "name": "Økonomi og regnskap", "claimedHits": 280, "enumerated": 280, "ratio": 1.0, "pageCapHit": false},
+    {"value": "65", "name": "IT", "claimedHits": 548, "enumerated": 548, "ratio": 1.0, "pageCapHit": false},
+    {"value": "66", "name": "Offentlig administrasjon", "claimedHits": 576, "enumerated": 576, "ratio": 1.0, "pageCapHit": false},
+    {"value": "67", "name": "Museer, gallerier og kulturminne", "claimedHits": 21, "enumerated": 21, "ratio": 1.0, "pageCapHit": false},
+    {"value": "68", "name": "Kirke og menighet", "claimedHits": 16, "enumerated": 16, "ratio": 1.0, "pageCapHit": false},
+    {"value": "69", "name": "Maritim og offshore", "claimedHits": 470, "enumerated": 470, "ratio": 1.0, "pageCapHit": false},
+    {"value": "7", "name": "Forlag og trykkeri", "claimedHits": 7, "enumerated": 7, "ratio": 1.0, "pageCapHit": false},
+    {"value": "70", "name": "Industri og produksjon", "claimedHits": 1141, "enumerated": 1141, "ratio": 1.0, "pageCapHit": false},
+    {"value": "8", "name": "IT - programvare", "claimedHits": 342, "enumerated": 342, "ratio": 1.0, "pageCapHit": false},
+    {"value": "9", "name": "Jordbruk og skogbruk", "claimedHits": 68, "enumerated": 68, "ratio": 1.0, "pageCapHit": false},
+    {"value": "9999", "name": "Annet", "claimedHits": 438, "enumerated": 438, "ratio": 1.0, "pageCapHit": false}
+  ],
+  "stillMissingLiveIdsSample": [],
+  "fetchErrorSample": []
+}
